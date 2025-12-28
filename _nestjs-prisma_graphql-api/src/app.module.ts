@@ -8,46 +8,23 @@ import { PrismaService } from './prisma.service.js';
 import { UserService } from './user.service.js';
 import { PostService } from './post.service.js';
 
-
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-//;import { join } from 'path';
-//import { AuthModule } from './modules/auth/auth.module';
-//import { SharedModule } from './shared/shared.module';
-
-
-
-/*
+import { join } from 'path';
+import { UserModule } from './user/user.module.js';
 
 @Module({
+  //imports: [ConfigModule.forRoot()],
   imports: [ConfigModule.forRoot(),
-      GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.graphql'),
-      playground: process.env.ENV==='dev',
-      context: ({ req }) => ({ request: req }),
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    AuthModule,
-    SharedModule,
+    UserModule,
+
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, UserService, PostService],
-})
-export class AppModule {}
-*/
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      debug: true,
-      playground: true,
-      autoSchemaFile: './src/schema.graphql',
-    }),
-    PrismaModule.forRoot({ isGlobal: true }),
-  ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
 

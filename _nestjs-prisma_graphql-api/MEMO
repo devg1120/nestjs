@@ -1,6 +1,8 @@
 
 
 https://prisma.io/docs/guides/nestjs
+https://qiita.com/Hashimoto-Noriaki/items/4f9acbaf7ad6388edeb3
+
 
 npm install -g @nestjs/cli
 nest new nestjs-prisma
@@ -28,7 +30,7 @@ services:
         max-size: "10k"
         max-file: "5"
 
-
+docker system prune
 docker compose up -d
 
 npm install prisma --save-dev
@@ -65,6 +67,10 @@ psql -h 127.0.0.1  -U postgres
 
 npx prisma generate
 
+npx tsx script.ts
+
+
+
 src/app_module.ts
   import { AppController } from './app.controller';
   ->
@@ -75,8 +81,74 @@ src/main.ts
   ->
   import { AppModule } from './app.module.js';
 
-
-npx tsx script.ts
-
 npm start
+------------------------------------------------
+est your endpoints with curl, Postman, or HTTPie.
+
+Create a user:
+
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
+
+Create a post:
+
+curl -X POST http://localhost:3000/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "authorEmail": "alice@prisma.io"}'
+
+Get published posts:
+
+curl http://localhost:3000/feed
+
+Publish a post:
+
+curl -X PUT http://localhost:3000/publish/1
+
+Search posts:
+
+curl http://localhost:3000/filtered-posts/Hello
+
+-----------------------------------------------------
+add graphql
+
+ERROR npm install @nestjs/graphql @nestjs/apollo apollo-server-express graphql
+yarn add @nestjs/apollo @apollo/server @as-integrations/express5 graphql
+
+..add
+src/user/user.model.ts
+src/user/user.resolver.ts
+src/user/user.module.ts
+
+src/app.module.ts
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { UserModule } from './user/user.module.js';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    UserModule,
+  ],
+})
+export class AppModule {}
+
+--------------------------------------------
+
+#browser
+http://127.0.0.1:3000/graphql
+
+
+#curl
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \"query { getUsers { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
 

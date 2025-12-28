@@ -80,4 +80,31 @@ src/main.ts
   import { AppModule } from './app.module.js';
 
 npm start
+------------------------------------------------
+est your endpoints with curl, Postman, or HTTPie.
+
+Create a user:
+
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
+
+Create a post:
+
+curl -X POST http://localhost:3000/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "authorEmail": "alice@prisma.io"}'
+
+Get published posts:
+
+curl http://localhost:3000/feed
+
+Publish a post:
+
+curl -X PUT http://localhost:3000/publish/1
+
+Search posts:
+
+curl http://localhost:3000/filtered-posts/hello
+
 
