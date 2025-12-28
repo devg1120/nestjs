@@ -1,0 +1,11 @@
+https://github.com/yields-llc/graphql-examples
+    "prisma": "^6.6.0"
+
+
+make start-db
+make start-server
+make build-client
+
+make run-example
+
+
