@@ -1,0 +1,154 @@
+
+
+https://prisma.io/docs/guides/nestjs
+https://qiita.com/Hashimoto-Noriaki/items/4f9acbaf7ad6388edeb3
+
+
+npm install -g @nestjs/cli
+nest new nestjs-prisma
+cd nestjs-prisma
+
+vi package.json
+{
+  "type": "module"
+}
+
+vi docker-compose.yml 
+version: "3.7"
+services:
+  db:
+    container_name: postgres
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    # Make postgres logs. More information about logging, see official documentation: https://www.postgresql.org/docs/11/runtime-config-logging.html
+    command: postgres -c log_destination=stderr -c log_statement=all -c log_connections=on -c log_disconnections=on
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    logging:
+      options:
+        max-size: "10k"
+        max-file: "5"
+
+docker system prune
+docker compose up -d
+
+npm install prisma --save-dev
+npm install @prisma/client @prisma/adapter-pg pg
+npx prisma init --datasource-provider postgresql --output ../src/generated/prisma
+
+vi prisma/schema.prisma
+---
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+---
+
+npx prisma migrate dev --name init
+
+psql -h 127.0.0.1  -U postgres
+
+# \c mydb;
+# \d
+# select * from "User";
+# select * from "Post";
+
+npx prisma generate
+
+npx tsx script.ts
+
+
+
+src/app_module.ts
+  import { AppController } from './app.controller';
+  ->
+  import { AppController } from './app.controller.js';
+
+src/main.ts
+  import { AppModule } from './app.module';
+  ->
+  import { AppModule } from './app.module.js';
+
+npm start
+------------------------------------------------
+est your endpoints with curl, Postman, or HTTPie.
+
+Create a user:
+
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
+
+Create a post:
+
+curl -X POST http://localhost:3000/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "authorEmail": "alice@prisma.io"}'
+
+Get published posts:
+
+curl http://localhost:3000/feed
+
+Publish a post:
+
+curl -X PUT http://localhost:3000/publish/1
+
+Search posts:
+
+curl http://localhost:3000/filtered-posts/Hello
+
+-----------------------------------------------------
+add graphql
+
+ERROR npm install @nestjs/graphql @nestjs/apollo apollo-server-express graphql
+yarn add @nestjs/apollo @apollo/server @as-integrations/express5 graphql
+
+..add
+src/user/user.model.ts
+src/user/user.resolver.ts
+src/user/user.module.ts
+
+src/app.module.ts
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { UserModule } from './user/user.module.js';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    UserModule,
+  ],
+})
+export class AppModule {}
+
+--------------------------------------------
+
+#browser
+http://127.0.0.1:3000/graphql
+
+
+#curl
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \"query { getUsers { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+

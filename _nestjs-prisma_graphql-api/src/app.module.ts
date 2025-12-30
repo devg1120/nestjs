@@ -11,7 +11,8 @@ import { PostService } from './post.service.js';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { UserModule } from './user/user.module.js';
+import { UserResolver } from './user/user.resolver.js';
+
 
 @Module({
   //imports: [ConfigModule.forRoot()],
@@ -20,11 +21,12 @@ import { UserModule } from './user/user.module.js';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    UserModule,
+    //UserModule,
 
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UserService, PostService],
+  providers: [AppService, PrismaService, UserService, PostService, UserResolver],
+  
 })
 export class AppModule {}
 

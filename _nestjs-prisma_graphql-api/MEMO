@@ -3,6 +3,8 @@
 https://prisma.io/docs/guides/nestjs
 https://qiita.com/Hashimoto-Noriaki/items/4f9acbaf7ad6388edeb3
 
+-- graphql
+https://zenn.dev/rince/articles/50a66241d04f0b
 
 npm install -g @nestjs/cli
 nest new nestjs-prisma
@@ -91,6 +93,10 @@ curl -X POST http://localhost:3000/user \
   -H "Content-Type: application/json" \
   -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
 
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Gusa", "email": "gusa@prisma.io"}'
+
 Create a post:
 
 curl -X POST http://localhost:3000/post \
@@ -110,45 +116,68 @@ Search posts:
 curl http://localhost:3000/filtered-posts/Hello
 
 -----------------------------------------------------
-add graphql
-
-ERROR npm install @nestjs/graphql @nestjs/apollo apollo-server-express graphql
-yarn add @nestjs/apollo @apollo/server @as-integrations/express5 graphql
-
-..add
-src/user/user.model.ts
-src/user/user.resolver.ts
-src/user/user.module.ts
-
-src/app.module.ts
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'path';
-import { UserModule } from './user/user.module.js';
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-    }),
-    UserModule,
-  ],
-})
-export class AppModule {}
-
---------------------------------------------
 
 #browser
 http://127.0.0.1:3000/graphql
 
+query {
+  users {
+    id
+    name
+    email
+  }
+}
+
+mutation {
+  createUser(  name: "test01", email: "test01@gmail.com" ){
+    id
+    name
+    email
+  }
+}
+
+
 
 #curl
+
 curl -H "content-type: application/json" -X POST -d " \
  { \
-   \"query\": \"query { getUsers { id name email }}\" \
+   \"query\": \"query { users { id name email }}\" \
  } \
 " http://127.0.0.1:3000/graphql
 
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \
+         \"query { users { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+
+
+cat << EOF > data.json
+ { 
+   "query": 
+         "query { users { id name email }}" 
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data.json \
+http://127.0.0.1:3000/graphql
+
+cat << EOF > data2.json
+ { 
+   "query": 
+      "mutation {
+        createUser(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
+          id
+          name
+          email
+        }
+      }"
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data2.json \
+http://127.0.0.1:3000/graphql
 

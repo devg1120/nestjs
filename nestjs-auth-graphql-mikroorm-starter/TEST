@@ -1,0 +1,18 @@
+
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
+
+curl -X GET http://localhost:3000/users \
+  -H "Content-Type: application/json" 
+
+curl  http://localhost:3000/users 
+
+
+curl -X POST -H "content-type: application/json"  -d " \
+ { \
+   \"query\": \"query { getUsers { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+
