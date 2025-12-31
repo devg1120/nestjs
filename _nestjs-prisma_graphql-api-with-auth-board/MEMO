@@ -1,0 +1,498 @@
+
+NestjsでSession認証を使ったログイン/ログアウトAPIを実装しよう！
+
+https://qiita.com/shun198/items/6c481a3aeaf6c8c7d7ad
+
+keyword
+  connect-pg-simple
+  express-session
+  passport
+  @nestjs/swagger
+
+=============================================================
+.env
+----
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"
+NODE_ENV="development"
+----
+
+docker system prune
+docker compose up -d
+
+yarn add express-session connect-pg-simple @nestjs/passport passport passport-local 
+yarn add @types/passport-local @types/express 
+yarn add @nestjs/swagger
+yarn add class-transformer
+yarn add class-validator
+yarn add dotenv
+
+$ vi prisma/schema.prisma 
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(255)
+  employee_number String          @unique @db.VarChar(8)
+  email           String          @unique
+  password        String          @db.VarChar(255)
+  role            Role            @default(ADMIN)
+  is_active       Boolean         @default(true)
+  is_verified     Boolean         @default(false)
+  is_superuser    Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+enum Role {
+  ADMIN
+  GENERAL
+}
+
+---
+px prisma migrate reset
+npx prisma migrate dev --name init
+
+~~~~
+      Warnings for the current datasource:
+    
+      • A unique constraint covering the columns `[employee_number]` on the table `User` will be added. If there are existing duplicate values, this will fail.
+    
+    ✔ Are you sure you want to create and apply this migration? … yes
+
+~~~~
+
+
+
+psql -h 127.0.0.1  -U postgres
+
+# \c mydb;
+# \d
+# select * from "User";
+
+npx prisma generate
+
+//ユーザ登録
+vi script.ts
+---
+import { prisma } from './lib/prisma.js'
+import * as bcrypt from './src/common/bcrypt.js';
+
+const enc_password = await bcrypt.encodePassword("test");
+
+async function main() {
+  // Create a new user with a post
+  const user = await prisma.user.create({
+    data: {
+      employee_number: '00000001',
+      //password: 'test',
+      password: enc_password,
+      name: 'Alice',
+      email: 'alice@prisma.io',
+      },
+    })
+
+  console.log('Created user:', user)
+}
+  
+
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
+---
+
+npx tsx script.ts
+
+vi src/main.ts
+async function bootstrap() {
+  console.log("=====",process.env.DATABASE_URL);
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  const pgSessionStore = pgSession(session);
+  app.use(
+    session({
+      store: new pgSessionStore({
+        // prismaで設定したDATABASE_URLを指定
+        conString: process.env.DATABASE_URL,
+        // テーブルが存在しなければ新規作成する
+        createTableIfMissing: true,
+      }),
+      //secret: process.env.SECRET_KEY,
+      secret: 'gusa',
+      resave: false,
+      saveUninitialized: false,
+      // セッション情報を1h保持
+      cookie: {
+        maxAge: 60 * 60 * 1000,
+      },
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.useGlobalPipes(new ValidationPipe());
+  if (process.env.NODE_ENV === 'development') {
+    const config = new DocumentBuilder()
+      .setTitle('CRM API Project')
+      .setDescription('CRM API description')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs/', app, document);
+    // Swaggerによるキャッシュ制御を無効にする
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.header('Pragma', 'no-cache');
+      res.header('Expires', '0');
+      next();
+    });
+  }
+  await app.listen(3000);
+}
+bootstrap();
+
+
+----
+
+
+nest generate module auth
+nest generate controller auth
+
+vi ./auth/auth.controller.ts
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { LogInUserDto } from './dto/loginUser.dto.js';
+import { ApiTags } from '@nestjs/swagger';
+import { LocalStrategy } from '../common/localStrategy.js';
+
+@ApiTags('login')
+@Controller()
+export class AuthController {
+  constructor(private localStrategy: LocalStrategy) {}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async logIn(
+    @Body() logInUserDto: LogInUserDto,
+    @Req() request: any,
+    @Res() response: any,
+  ) {
+    const user = await this.localStrategy.validate(
+      logInUserDto.employee_number,
+      logInUserDto.password,
+    );
+    request.session.user = user;
+    response.status(HttpStatus.OK).json({ name: user.name, role: user.role });
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  //async logout(@Req() request: any, @Res() response: any): Promise<void> {
+  async logout(@Req() request: any,): Promise<void> {
+          console.log("----  logout");
+//        console.dir(request);
+    request.session.destroy();
+    //response.clearCookie('connect.sid'); 
+
+  }
+}
+
+vi ./auth/auth.module.ts
+import { Module } from '@nestjs/common';
+import { AuthController } from './auth.controller.js';
+//import { PrismaModule } from '../prisma/prisma.module.js';
+import { PassportModule } from '@nestjs/passport';
+import { PrismaService } from '../prisma.service.js';
+import { LocalStrategy } from '../common/localStrategy.js';
+
+@Module({
+  //imports: [PrismaModule, PassportModule.register({ session: true })],
+  imports: [PassportModule.register({ session: true })],
+  controllers: [AuthController],
+  providers: [PrismaService, LocalStrategy],
+})
+export class AuthModule {}
+
+vi ./auth/dto/loginUser.dto.ts
+import { IsString, MaxLength, Validate } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+//import { IsEmployeeNumber } from '../../common/validators';
+
+export class LogInUserDto {
+  @ApiProperty({ description: '社員番号', example: '00000001' })
+  @IsString()
+  //@Validate(IsEmployeeNumber)
+  employee_number: string;
+
+  @ApiProperty({ description: 'パスワード', example: 'test' })
+  @IsString()
+  @MaxLength(255)
+  password: string;
+}
+
+
+
+npm start
+
+http://127.0.0.1:3000/api/docs/
+
+# LOGIN
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "test"}'
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
+
+# LOGIN password error
+curl -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "xxxx"}'
+
+# LOGIN user  not register
+curl -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000002", "password": "test"}'
+
+
+
+=============================================================
+NestJSにおける基本概念の徹底解説
+https://zenn.dev/nameless_sn/articles/nestjs-fundamental
+
+@passport/jwt
+https://zenn.dev/nameless_sn/articles/nestjs_user-auth_tutorial
+
+=============================================================
+
+=============================================================
+
+https://prisma.io/docs/guides/nestjs
+https://qiita.com/Hashimoto-Noriaki/items/4f9acbaf7ad6388edeb3
+
+-- graphql
+https://zenn.dev/rince/articles/50a66241d04f0b
+
+npm install -g @nestjs/cli
+nest new nestjs-prisma
+cd nestjs-prisma
+
+vi package.json
+{
+  "type": "module"
+}
+
+vi docker-compose.yml 
+version: "3.7"
+services:
+  db:
+    container_name: postgres
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    # Make postgres logs. More information about logging, see official documentation: https://www.postgresql.org/docs/11/runtime-config-logging.html
+    command: postgres -c log_destination=stderr -c log_statement=all -c log_connections=on -c log_disconnections=on
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    logging:
+      options:
+        max-size: "10k"
+        max-file: "5"
+
+docker system prune
+docker compose up -d
+
+npm install prisma --save-dev
+npm install @prisma/client @prisma/adapter-pg pg
+npx prisma init --datasource-provider postgresql --output ../src/generated/prisma
+
+vi prisma/schema.prisma
+---
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+---
+
+npx prisma migrate dev --name init
+
+psql -h 127.0.0.1  -U postgres
+
+# \c mydb;
+# \d
+# select * from "User";
+# select * from "Post";
+
+npx prisma generate
+
+npx tsx script.ts
+
+
+
+src/app_module.ts
+  import { AppController } from './app.controller';
+  ->
+  import { AppController } from './app.controller.js';
+
+src/main.ts
+  import { AppModule } from './app.module';
+  ->
+  import { AppModule } from './app.module.js';
+
+npm start
+------------------------------------------------
+est your endpoints with curl, Postman, or HTTPie.
+
+Create a user:
+
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Alice2", "email": "alice2@prisma.io"}'
+
+curl -X POST http://localhost:3000/user \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Gusa", "email": "gusa@prisma.io"}'
+
+Create a post:
+
+curl -X POST http://localhost:3000/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "authorEmail": "alice@prisma.io"}'
+
+Get published posts:
+
+curl http://localhost:3000/post/1
+
+curl http://localhost:3000/feed
+
+Publish a post:
+
+curl -X PUT http://localhost:3000/publish/1
+
+Search posts:
+
+curl http://localhost:3000/filtered-posts/Hello
+
+curl http://localhost:3000/filtered-posts/
+
+
+
+
+
+-----------------------------------------------------
+
+schema.gql  自動生成
+----
+type User {
+  id: Int!
+  name: String!
+  email: String!
+}
+
+type Query {
+  users: [User!]!
+}
+
+type Mutation {
+  createUser(name: String!, email: String!): User!
+}
+------
+
+#browser
+http://127.0.0.1:3000/graphql
+
+query {
+  users {
+    id
+    name
+    email
+  }
+}
+
+mutation {
+  createUser(  name: "test01", email: "test01@gmail.com" ){
+    id
+    name
+    email
+  }
+}
+
+
+
+#curl
+
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \"query { users { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \
+         \"query { users { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+
+
+cat << EOF > data.json
+ { 
+   "query": 
+         "query { users { id name email }}" 
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data.json \
+http://127.0.0.1:3000/graphql
+
+cat << EOF > data2.json
+ { 
+   "query": 
+      "mutation {
+        createUser(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
+          id
+          name
+          email
+        }
+      }"
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data2.json \
+http://127.0.0.1:3000/graphql
+
