@@ -3,7 +3,19 @@ NestjsでSession認証を使ったログイン/ログアウトAPIを実装しよ
 
 https://qiita.com/shun198/items/6c481a3aeaf6c8c7d7ad
 
+keyword
+  connect-pg-simple
+  express-session
+  passport
+  @nestjs/swagger
+
 =============================================================
+.env
+----
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"
+NODE_ENV="development"
+----
+
 docker system prune
 docker compose up -d
 
@@ -13,7 +25,6 @@ yarn add @nestjs/swagger
 yarn add class-transformer
 yarn add class-validator
 yarn add dotenv
-
 
 $ vi prisma/schema.prisma 
 generator client {
@@ -68,7 +79,7 @@ psql -h 127.0.0.1  -U postgres
 npx prisma generate
 
 //ユーザ登録
-npx tsx script.ts
+vi script.ts
 ---
 import { prisma } from './lib/prisma.js'
 import * as bcrypt from './src/common/bcrypt.js';
@@ -102,6 +113,7 @@ main()
   })
 ---
 
+npx tsx script.ts
 
 vi src/main.ts
 async function bootstrap() {
@@ -240,6 +252,7 @@ export class LogInUserDto {
 
 npm start
 
+http://127.0.0.1:3000/api/docs/
 
 # LOGIN
 curl -c cookie.txt  -X POST http://localhost:3000/api/login \

@@ -1,9 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-//import * as session from 'express-session';
 import  session from 'express-session';
-//import * as passport from 'passport';
 import  passport from 'passport';
-//import * as pgSession from 'connect-pg-simple';
 import  pgSession from 'connect-pg-simple';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
