@@ -105,6 +105,8 @@ curl -X POST http://localhost:3000/post \
 
 Get published posts:
 
+curl http://localhost:3000/post/1
+
 curl http://localhost:3000/feed
 
 Publish a post:
@@ -115,7 +117,30 @@ Search posts:
 
 curl http://localhost:3000/filtered-posts/Hello
 
+curl http://localhost:3000/filtered-posts/
+
+
+
+
+
 -----------------------------------------------------
+
+schema.gql  自動生成
+----
+type User {
+  id: Int!
+  name: String!
+  email: String!
+}
+
+type Query {
+  users: [User!]!
+}
+
+type Mutation {
+  createUser(name: String!, email: String!): User!
+}
+------
 
 #browser
 http://127.0.0.1:3000/graphql
