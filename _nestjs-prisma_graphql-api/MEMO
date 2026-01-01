@@ -103,6 +103,10 @@ curl -X POST http://localhost:3000/post \
   -H "Content-Type: application/json" \
   -d '{"title": "Hello World", "authorEmail": "alice@prisma.io"}'
 
+curl -X POST http://localhost:3000/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "content": "---CONTENT--", "authorEmail": "gusa@prisma.io"}'
+
 Get published posts:
 
 curl http://localhost:3000/post/1

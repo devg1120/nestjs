@@ -1,0 +1,209 @@
+
+NestjsでSession認証を使ったログイン/ログアウトAPIを実装しよう！
+
+https://qiita.com/shun198/items/6c481a3aeaf6c8c7d7ad
+
+keyword
+  connect-pg-simple
+  express-session
+  passport
+  @nestjs/swagger
+
+=============================================================
+.env
+----
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mydb?schema=public"
+NODE_ENV="development"
+----
+
+docker system prune
+docker compose up -d
+
+$ vi prisma/schema.prisma 
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(255)
+  employee_number String          @unique @db.VarChar(8)
+  email           String          @unique
+  password        String          @db.VarChar(255)
+  role            Role            @default(ADMIN)
+  is_active       Boolean         @default(true)
+  is_verified     Boolean         @default(false)
+  is_superuser    Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+enum Role {
+  ADMIN
+  GENERAL
+}
+
+model Board {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  board    Board?    @relation(fields: [boardId], references: [id])
+  boardId  Int?
+}
+
+---
+npx prisma migrate reset
+rm  -rf prisma/migrations/*
+
+npx prisma migrate dev --name init
+
+psql -h 127.0.0.1  -U postgres
+
+# \c mydb;
+# \d
+# select * from "User";
+# select * from "Post";
+
+npx prisma generate
+
+~~~~
+
+// user 登録
+npx tsx script.ts
+
+// board 登録
+npx tsx script2.ts
+
+
+curl -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "hyogo" , "email": "gusa@prisma.io"}'
+
+Create a post:
+
+curl -X POST http://localhost:3000/api/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World", "content": "CONTENT", "authorEmail": "gusa@prisma.io"}'
+
+Get published posts:
+
+curl http://localhost:3000/post/1
+
+curl http://localhost:3000/feed
+
+Publish a post:
+
+curl -X PUT http://localhost:3000/publish/1
+
+Search posts:
+
+curl http://localhost:3000/filtered-posts/Hello
+
+curl http://localhost:3000/filtered-posts/
+
+
+#browser
+http://127.0.0.1:3000/graphql
+
+query {
+ boards {
+    id
+    name
+    email    <-- err
+  }
+}
+
+
+mutation {
+  createUser(  name: "test01", email: "test01@gmail.com" ){
+    id
+    name
+    email
+  }
+}
+
+
+
+#curl
+
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \"query { boards { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+
+curl -H "content-type: application/json" -X POST -d " \
+ { \
+   \"query\": \
+         \"query { users { id name email }}\" \
+ } \
+" http://127.0.0.1:3000/graphql
+
+
+
+cat << EOF > data.json
+ { 
+   "query": 
+         "query { users { id name email }}" 
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data.json \
+http://127.0.0.1:3000/graphql
+
+cat << EOF > data2.json
+ { 
+   "query": 
+      "mutation {
+        createUser(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
+          id
+          name
+          email
+        }
+      }"
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data2.json \
+http://127.0.0.1:3000/graphql
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
