@@ -8,6 +8,9 @@ export class Board {
   @Field()
   name: string;
 
+  @Field()
+  email: string;
+
 }
 
 

@@ -1,4 +1,4 @@
- {  
-   "query":    
-         "query { users { id name email }}"    
- }  
+ { 
+   "query": 
+         "query { boards { id name email }}"
+ } 

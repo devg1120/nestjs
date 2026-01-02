@@ -5,6 +5,7 @@
 type Board {
   id: Int!
   name: String!
+  email: String!
 }
 
 type Query {

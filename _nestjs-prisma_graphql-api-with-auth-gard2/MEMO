@@ -88,9 +88,47 @@ npx tsx script.ts
 npx tsx script2.ts
 
 
+######################################################################################
+
+# LOGIN
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "test"}'
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
+
+# LOGIN password error
+curl -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "xxxx"}'
+
+# LOGIN user  not register
+curl -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000002", "password": "test"}'
+
+
+######################################################################################
+
+
+######################################################################################
+BOARD
+######################################################################################
 curl -X POST http://localhost:3000/api/board \
   -H "Content-Type: application/json" \
   -d '{"name": "hyogo" , "email": "gusa@prisma.io"}'
+
+curl -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "tokyo2" , "email": "tokyo2@prisma.io"}'
+
+
 
 Create a post:
 
@@ -98,22 +136,43 @@ curl -X POST http://localhost:3000/api/post \
   -H "Content-Type: application/json" \
   -d '{"title": "Hello World", "content": "CONTENT", "authorEmail": "gusa@prisma.io"}'
 
+curl -X POST http://localhost:3000/api/post \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Hello World3", "content": "CONTENT3", "authorEmail": "tokyo@prisma.io"}'
+
 Get published posts:
 
-curl http://localhost:3000/post/1
+curl http://localhost:3000/api/post/1
+curl http://localhost:3000/api/post/5
 
-curl http://localhost:3000/feed
+curl http://localhost:3000/api/feed
 
 Publish a post:
 
-curl -X PUT http://localhost:3000/publish/1
+curl -X PUT http://localhost:3000/api/publish/5
 
 Search posts:
 
-curl http://localhost:3000/filtered-posts/Hello
+curl http://localhost:3000/api/filtered-posts/Hello
 
-curl http://localhost:3000/filtered-posts/
 
+#############  session test  #############################################
+curl http://localhost:3000/api/feed
+
+# LOGIN
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "test"}'
+
+curl -b cookie.txt http://localhost:3000/api/feed
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
+
+#############  graphql #############################################
 
 #browser
 http://127.0.0.1:3000/graphql
@@ -122,13 +181,13 @@ query {
  boards {
     id
     name
-    email    <-- err
+    email    
   }
 }
 
 
 mutation {
-  createUser(  name: "test01", email: "test01@gmail.com" ){
+  createBoard(  name: "test01", email: "test01@gmail.com" ){
     id
     name
     email
@@ -149,7 +208,7 @@ curl -H "content-type: application/json" -X POST -d " \
 curl -H "content-type: application/json" -X POST -d " \
  { \
    \"query\": \
-         \"query { users { id name email }}\" \
+         \"query { boards { id name email }}\" \
  } \
 " http://127.0.0.1:3000/graphql
 
@@ -158,7 +217,7 @@ curl -H "content-type: application/json" -X POST -d " \
 cat << EOF > data.json
  { 
    "query": 
-         "query { users { id name email }}" 
+         "query { boards { id name email }}" 
  } 
 EOF
 
@@ -169,7 +228,7 @@ cat << EOF > data2.json
  { 
    "query": 
       "mutation {
-        createUser(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
+        createBoard(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
           id
           name
           email
@@ -180,29 +239,6 @@ EOF
 
 curl -H "content-type: application/json" -X POST --data  @./data2.json \
 http://127.0.0.1:3000/graphql
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

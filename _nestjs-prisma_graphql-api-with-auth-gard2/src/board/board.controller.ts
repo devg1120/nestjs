@@ -10,6 +10,7 @@ import {
   Param,
   Req,
   Res,
+  Session,
 } from '@nestjs/common';
 //import { LogInBoardDto } from './dto/loginBoard.dto.js';
 import { ApiTags } from '@nestjs/swagger';
@@ -32,9 +33,25 @@ export class BoardController {
   async getPostById(@Param('id') id: string): Promise<PostModel | null> {
     return this.postService.post({ id: Number(id) });
   }
-
+/*
   @Get('feed')
   async getPublishedPosts(): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: { published: true },
+    });
+  }
+*/
+  @Get('feed')
+  async getPublishedPosts(
+     //@Req() request: Request
+     @Session() session: Record<string, any>
+  ): Promise<PostModel[]> {
+       console.dir(session);
+        if (session.user) {
+                console.log(" logined");
+        } else {
+                console.log(" not logined");
+        }
     return this.postService.posts({
       where: { published: true },
     });
