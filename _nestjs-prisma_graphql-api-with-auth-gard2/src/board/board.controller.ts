@@ -11,6 +11,7 @@ import {
   Req,
   Res,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 //import { LogInBoardDto } from './dto/loginBoard.dto.js';
 import { ApiTags } from '@nestjs/swagger';
@@ -19,6 +20,9 @@ import { BoardService } from './board.service.js';
 import { PostService } from './post.service.js';
 import { Board as BoardModel } from '../generated/prisma/client.js';
 import { Post as PostModel } from '../generated/prisma/client.js';
+
+import { AdminAuthGuard } from '../guards/admin-auth.guard.js';
+import { UserAuthGuard } from '../guards/user-auth.guard.js';
 
 
 @ApiTags('login')
@@ -42,6 +46,7 @@ export class BoardController {
   }
 */
   @Get('feed')
+  @UseGuards(UserAuthGuard)
   async getPublishedPosts(
      //@Req() request: Request
      @Session() session: Record<string, any>
@@ -102,6 +107,7 @@ export class BoardController {
   }
 */
   @Post('board')
+  @UseGuards(AdminAuthGuard)
   async signupBoard(
     //@Body() userData: { name?: string;  },
     @Body() userData: { name?: string; email: string },

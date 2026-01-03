@@ -1,8 +1,17 @@
+import {
+  UseGuards,
+  Session,
+} from '@nestjs/common';
+
 //import { Resolver, Query } from '@nestjs/graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { PrismaService } from '../prisma.service.js';
 import { Board } from './board.model.js';
+
+//import { AdminAuthGuard } from '../guards/admin-auth.guard.js';
+//import { UserAuthGuard } from '../guards/user-auth.guard.js';
+import { GqlAuthGuard } from '../guards/gql-auth.guard.js';
 
 @Resolver(() => Board)
 export class BoardResolver {
@@ -14,12 +23,17 @@ export class BoardResolver {
   }
 
   @Mutation(() => Board)
+  @UseGuards(GqlAuthGuard)
   async createBoard(
     @Args('name') name: string,
     @Args('email') email: string,
+
   ) {
+
+
     return this.prisma.board.create({ data: {  name , email } });
   }
+
 /*
   @Query(() => [Board])
   getBoards(): Board[] {

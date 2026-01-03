@@ -3184,6 +3184,11 @@ cosmiconfig@^8.2.0:
     parse-json "^5.2.0"
     path-type "^4.0.0"
 
+create-nestjs-middleware-module@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/create-nestjs-middleware-module/-/create-nestjs-middleware-module-0.4.0.tgz#a1170e011cb083a55f74d45580e54b043bcec7e0"
+  integrity sha512-3VmkthTIY9wHcbfwZKQycFb81mrmKC3JDumrS5a/76EfQ9NI7cpBdf7bvNrk/qU5/58JRebNtNbqZSRh7yLgZA==
+
 create-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.npmjs.org/create-require/-/create-require-1.1.1.tgz"
@@ -5146,6 +5151,13 @@ neo-async@^2.6.2:
   version "2.6.2"
   resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
+
+nestjs-session@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/nestjs-session/-/nestjs-session-4.0.0.tgz#a207e1c50ee15d3383a4ec7a84a6e3981c6eb731"
+  integrity sha512-DWWCdsB+UuCMUvV4rqheKlFEVz6iN1O6yJh6NpwGsl21aBlNLwbQDsWy/XHD/nqfvF30LK8AWbiptBxcPa08zg==
+  dependencies:
+    create-nestjs-middleware-module "^0.4.0"
 
 node-abort-controller@^3.0.1:
   version "3.1.1"

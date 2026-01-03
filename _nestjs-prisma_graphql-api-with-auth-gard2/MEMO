@@ -156,8 +156,10 @@ Search posts:
 curl http://localhost:3000/api/filtered-posts/Hello
 
 
-#############  session test  #############################################
+#############  session test   UserAuthGuard #############################################
 curl http://localhost:3000/api/feed
+
+ =>  ERROR  ログインしていないため、この操作を実行する権限がありません
 
 # LOGIN
 curl -c cookie.txt  -X POST http://localhost:3000/api/login \
@@ -172,6 +174,52 @@ curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
   -H "accept: */*" \
   -d ''
 
+#############  session test   AdminAuthGuard #############################################
+curl -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "tokyo3" , "email": "tokyo3@prisma.io"}'
+
+ => ERROR ログインしていないため、この操作を実行する権限がありません
+
+# LOGIN GENERAL
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000002", "password": "test"}'
+
+curl -b cookie.txt -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "tokyo3" , "email": "tokyo3@prisma.io"}'
+
+ => ERROR "管理者ユーザではないため、この操作を実行する権限がありません
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
+
+# LOGIN ADMIN
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000001", "password": "test"}'
+
+curl -b cookie.txt -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "tokyo4" , "email": "tokyo4@prisma.io"}'
+
+ => OK
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
+
+curl -b cookie.txt -X POST http://localhost:3000/api/board \
+  -H "Content-Type: application/json" \
+  -d '{"name": "tokyo5" , "email": "tokyo5@prisma.io"}'
+
+ => ERROR ログインしていないため、この操作を実行する権限がありません
 #############  graphql #############################################
 
 #browser
@@ -224,22 +272,70 @@ EOF
 curl -H "content-type: application/json" -X POST --data  @./data.json \
 http://127.0.0.1:3000/graphql
 
+
+mutation {
+  createBoard(  name: "test01", email: "test01@gmail.com" ){
+    id  
+    name 
+    email
+  }
+}
+
 cat << EOF > data2.json
  { 
    "query": 
-      "mutation {
-        createBoard(  name: \\"test100\\", email: \\"test100@gmail.com\\" ){
-          id
-          name
-          email
-        }
-      }"
+      "mutation {  createBoard(  name: \\"test98\\", email: \\"test98@gmail.com\\" ){ id name email }}"
+ } 
+EOF
+
+cat << EOF  | tr -d '\n' > data2.json
+ { 
+   "query": 
+      "mutation {  createBoard(  
+          name: \\"test97\\", email: \\"test97@gmail.com\\" ){ id name email }}"
+ } 
+EOF
+
+tr -d '\n' << EOF  > data2.json
+ { 
+   "query": 
+      "mutation {  createBoard(  
+          name: \\"test96\\", email: \\"test96@gmail.com\\" ){ id name email }}"
  } 
 EOF
 
 curl -H "content-type: application/json" -X POST --data  @./data2.json \
 http://127.0.0.1:3000/graphql
 
+#############  session test   UserAuthGuard #############################################
+
+tr -d '\n' << EOF  > data2.json
+ { 
+   "query": 
+      "mutation {  createBoard(  
+          name: \\"test105\\", email: \\"test105@gmail.com\\" ){ id name email }}"
+ } 
+EOF
+
+curl -H "content-type: application/json" -X POST --data  @./data2.json \
+http://127.0.0.1:3000/graphql
+
+  ==> Error  message":"Forbidden resourc
+
+# LOGIN GENERAL
+curl -c cookie.txt  -X POST http://localhost:3000/api/login \
+  -H "accept: */*" \
+  -H "Content-Type: application/json" \
+  -d '{"employee_number": "00000002", "password": "test"}'
 
 
+curl -b cookie.txt -H "content-type: application/json" -X POST --data  @./data2.json \
+http://127.0.0.1:3000/graphql
+
+ => OK
+
+# LOGOUT
+curl -b cookie.txt  -X POST http://localhost:3000/api/logout \
+  -H "accept: */*" \
+  -d ''
 
