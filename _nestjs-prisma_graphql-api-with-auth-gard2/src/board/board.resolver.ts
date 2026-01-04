@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 
 //import { Resolver, Query } from '@nestjs/graphql';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver , Context} from '@nestjs/graphql';
 
 import { PrismaService } from '../prisma.service.js';
 import { Board } from './board.model.js';
@@ -27,9 +27,7 @@ export class BoardResolver {
   async createBoard(
     @Args('name') name: string,
     @Args('email') email: string,
-
   ) {
-
 
     return this.prisma.board.create({ data: {  name , email } });
   }

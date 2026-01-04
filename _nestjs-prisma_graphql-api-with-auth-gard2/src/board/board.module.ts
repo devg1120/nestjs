@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module , NestMiddleware , MiddlewareConsumer} from '@nestjs/common';
 import { BoardController } from './board.controller.js';
 import { BoardResolver } from './board.resolver.js';
 import { BoardService } from './board.service.js';
@@ -13,40 +13,30 @@ import { join } from 'path';
 import { PassportModule } from '@nestjs/passport';
 import { SessionModule } from 'nestjs-session';
 
+import session from 'express-session';
+import { AuthModule } from '../auth/auth.module.js';
+
 
 @Module({
 
   imports: [ConfigModule.forRoot(),
+
+    PassportModule.register({ session: true }),
+
+    SessionModule.forRoot({
+      session: {
+        secret: 'keyboard cat',
+        // resave: false,
+        // saveUninitialized: false,
+      },
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-
-      
-  playground: {
-    settings: {
-      "request.credentials": "include", // Otherwise cookies won't be sent
-    }
-  },
-
-
- // Source - https://stackoverflow.com/a
-// Posted by Raj Gohil, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-01-02, License - CC BY-SA 4.0
-
+      context: ({ req  }) => ({ req }), 
 
     }),
-
-/*
-    PassportModule.register({ session: true }), // セッションを有効化
-    SessionModule.forRoot({ // セッションミドルウェアの設定例 (http-server用)
-      session: {
-        secret: 'your_secret_key',
-        resave: false,
-        saveUninitialized: false,
-      },
-      // GraphQLの場合は異なる設定が必要な場合がある
-    }),
-*/
+    AuthModule,
   ],
 
   controllers: [BoardController],
