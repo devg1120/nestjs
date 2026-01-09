@@ -48,9 +48,9 @@ export class BoardController {
   @Get('feed')
   @UseGuards(UserAuthGuard)
   async getPublishedPosts(
-     //@Req() request: Request
      @Session() session: Record<string, any>
   ): Promise<PostModel[]> {
+
        console.dir(session);
         if (session.user) {
                 console.log(" logined");

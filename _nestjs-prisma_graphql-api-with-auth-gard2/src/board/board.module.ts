@@ -14,7 +14,6 @@ import { PassportModule } from '@nestjs/passport';
 import { SessionModule } from 'nestjs-session';
 
 import session from 'express-session';
-import { AuthModule } from '../auth/auth.module.js';
 
 
 @Module({
@@ -22,7 +21,7 @@ import { AuthModule } from '../auth/auth.module.js';
   imports: [ConfigModule.forRoot(),
 
     PassportModule.register({ session: true }),
-
+/*
     SessionModule.forRoot({
       session: {
         secret: 'keyboard cat',
@@ -30,13 +29,16 @@ import { AuthModule } from '../auth/auth.module.js';
         // saveUninitialized: false,
       },
     }),
+   */
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      context: ({ req  }) => ({ req }), 
+      //context: ({ req  }) => ({ req }), 
+      context: ({ req, res }) => ({ req, res }),
+
 
     }),
-    AuthModule,
+    //AuthModule,
   ],
 
   controllers: [BoardController],

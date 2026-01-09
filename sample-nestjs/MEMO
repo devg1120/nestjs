@@ -1,0 +1,73 @@
+docker compose up -d
+
+yarn
+yarn prisma migrate dev --name init
+
+
+yarn prisma generate
+
+yarn prisma db seed
+
+psql -h 127.0.0.1  -U postgres
+
+password: password
+\c sample-nestjs  
+
+npm start
+
+
+yarn prisma migrate dev
+
+yarn prisma migrate reset
+
+-----------------------------------------------------
+data1.json
+{
+   "query":
+         "query ExampleUserQuery{ users { email id }}"
+}
+
+curl -H "content-type: application/json" -X POST --data  @./data1.json \
+http://127.0.0.1:3000/graphql
+
+
+
+tr -d '\n' << EOF  > login.json
+{"query":
+  "mutation  Login(\$input: LoginUserInput!) {
+  login(input: \$input) {
+    email
+    id
+   }
+  }"
+,
+"variables":{
+   "input": {
+     "email": "user01@test.com",
+     "password": "Passw0rd!"
+   }
+ }
+ 
+}
+EOF
+
+# LOGIN GENERAL
+curl -c cookie.txt  -H "content-type: application/json" -X POST --data  @./login.json \
+http://127.0.0.1:3000/graphql
+
+
+
+data1.json
+{
+   "query":
+         "query ExampleUserQuery{ users { email id }}"
+}
+
+
+
+curl -b cookie.txt -H "content-type: application/json" -X POST --data  @./data1.json \
+http://127.0.0.1:3000/graphql
+
+ => OK
+
+# LOGOUT

@@ -7,6 +7,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 import { Request, Response, NextFunction } from 'express';
 import 'dotenv/config'
+import  cookieParser from 'cookie-parser';
+
 
 async function bootstrap() {
   console.log("=====",process.env.DATABASE_URL);
@@ -27,12 +29,16 @@ async function bootstrap() {
       saveUninitialized: false,
       // セッション情報を1h保持
       cookie: {
+           httpOnly: true,
+
         maxAge: 60 * 60 * 1000,
       },
     }),
   );
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(cookieParser());
+
   app.useGlobalPipes(new ValidationPipe());
   if (process.env.NODE_ENV === 'development') {
     const config = new DocumentBuilder()
@@ -50,6 +56,7 @@ async function bootstrap() {
       next();
     });
   }
+
   await app.listen(3000);
 }
 bootstrap();
