@@ -73,8 +73,62 @@ http://127.0.0.1:3000/graphql
 # LOGOUT
 
 
+tr -d '\n' << EOF  > logout.json
+{"query":
+  "mutation   { logout }"
+}
+EOF
+curl -c cookie.txt -b cookie.txt -H "content-type: application/json" -X POST --data  @./logout.json \
+http://127.0.0.1:3000/graphql
+
 -----------------------------
+PLAYGROUND
+http://localhost:3000/graphql
+
+
+mutation Login($input: LoginUserInput!) {
+  login(input: $input) {
+    email
+    id
+  }
+}
+
+{
+  "input": {
+    "email": "admin@test.com",
+    "password": "Passw0rd!"
+  }
+}
+
+
+query ExampleUserQuery {
+  users {
+    email
+    id
+  }
+}
+
+
+-----------------------------
+【Redis 入門】よく使う redis-cli コマンドまとめ
+
+http://zenn.dev/leegrey/articles/4136078c49702d
+
 sudo apt install redis-tools 
 $ redis-cli
 127.0.0.1:6379> 
+
+$ redis-cli
+127.0.0.1:6379> keys *
+1) "sess:Nv2rVHSN-hveLZoTJDfo24_AVEuV1gPZ"
+2) "sess:yhdwouuwpPt3pZjSqDarVku_6GFbFOIF"
+
+127.0.0.1:6379> get "sess:yhdwouuwpPt3pZjSqDarVku_6GFbFOIF"
+"{\"cookie\":{\"originalMaxAge\":600000,\"expires\":\"2026-01-10T01:49:54.471Z\",\"secure\":false,\"httpOnly\":false,\"path\":\"/\"},\"passport\":{\"user\":{\"id\":\"fa119cb6-9135-57f5-8a5a-54f28d566d0f\",\"isAdmin\":false}}}"
+
+127.0.0.1:6379> TTL  "sess:1iIfVQig0F4pi32PRRvLnhbCjvhF6RoV"
+(integer) 577
+
+127.0.0.1:6379> del "sess:eWeqJjqiT-3vaIt9Eu5elHqVTPhALpd_"
+(integer) 1
 

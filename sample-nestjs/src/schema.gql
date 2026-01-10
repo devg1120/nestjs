@@ -14,6 +14,7 @@ input LoginUserInput {
 type Mutation {
   createPost(input: CreatePostInput!): PostModel!
   login(input: LoginUserInput!): UserModel
+  logout: Boolean!
   register(input: RegisterUserInput!): UserModel
 }
 

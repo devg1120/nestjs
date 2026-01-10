@@ -21,8 +21,9 @@ import { RedisModule, REDIS } from './modules/redis';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: false,
-      playground: true,
+      //playground: true,
       autoSchemaFile: path.join(process.cwd(), "src/schema.gql"),
+      context: ({ req, res }) => ({ req, res }),
       sortSchema: true,
      
       cors: {
@@ -32,6 +33,12 @@ import { RedisModule, REDIS } from './modules/redis';
         allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
         methods: "*"
       },
+
+  playground: {
+    settings: {
+      "request.credentials": "include"
+    }
+  }
      
     }),
     PostsModule,
@@ -46,14 +53,16 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         session({
-          store: new (RedisStore(session))({ client: this.redis, logErrors: true }),
+		// npmjs.com/package/connect-redis
+          store: new (RedisStore(session))({ client: this.redis, logErrors: true , disableTouch: false}),
           saveUninitialized: false,
           secret: 'secret',
           resave: false,
           cookie: {
-            /*sameSite: 'lax',*/
-            httpOnly: false,
-            maxAge: 60000 * 10,
+            path: '/', 
+            sameSite: 'lax',
+            httpOnly: true,
+            maxAge: 60000  * 10,
             secure: false,
             //domain: "localhost" // TODO: 環境変数経由で呼ぶようにしたい
             //domain: "*" // TODO: 環境変数経由で呼ぶようにしたい
