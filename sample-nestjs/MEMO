@@ -1,3 +1,14 @@
+
+
+NestJSでGraphQLとPrismaとPassportの素振り
+
+https://zenn.dev/monicle/articles/6961f6cd666d5b
+
+
+
+
+
+
 docker compose up -d
 
 yarn
@@ -64,11 +75,20 @@ data1.json
 }
 
 
-
+$get all User
 curl -b cookie.txt -H "content-type: application/json" -X POST --data  @./data1.json \
 http://127.0.0.1:3000/graphql
 
  => OK
+
+# get Post
+curl -b cookie.txt  -H "content-type: application/json" -X POST --data  @./get_post.json \
+http://127.0.0.1:3000/graphql
+
+#create Post
+curl -b cookie.txt  -H "content-type: application/json" -X POST --data  @./create_post.json \
+http://127.0.0.1:3000/graphql
+
 
 # LOGOUT
 

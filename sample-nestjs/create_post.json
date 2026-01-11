@@ -1,0 +1,1 @@
+{"query":  "mutation  createPost($input: CreatePostInput!) {  createPost(input: $input) {  id  title  }  }","variables":{   "input": {     "title": "タイトル999"   } }}
