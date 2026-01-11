@@ -1,0 +1,1 @@
+ {    "query":       "mutation {  createBoard(            name: \"test117\", email: \"test123@gmail.com\" ){ id name email }}" } 

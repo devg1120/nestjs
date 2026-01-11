@@ -1,0 +1,171 @@
+最強のクエリビルダ「kysely」の紹介 ~薄いORMを探して~
+
+https://zenn.dev/randd_inc/articles/b8e009b74863ab
+
+yarn add kysely
+
+yarn add -D kysely-codegen
+
+yarn add pg
+yarn add -D @types/pg
+
+.env
+----
+DATABASE_URL="postgresql://postgres:password@localhost:5432/sample-nestjs?schema=public"
+
+yarn kysely-codegen --out-file src/types.ts
+
+------------------------------------------------------
+
+NestJSでGraphQLとPrismaとPassportの素振り
+
+https://zenn.dev/monicle/articles/6961f6cd666d5b
+
+
+
+
+
+
+docker compose up -d
+
+yarn
+yarn prisma migrate dev --name init
+
+
+yarn prisma generate
+
+yarn prisma db seed
+
+psql -h 127.0.0.1  -U postgres
+
+password: password
+\c sample-nestjs  
+
+npm start
+
+
+yarn prisma migrate dev
+
+yarn prisma migrate reset
+
+-----------------------------------------------------
+data1.json
+{
+   "query":
+         "query ExampleUserQuery{ users { email id }}"
+}
+
+curl -H "content-type: application/json" -X POST --data  @./data1.json \
+http://127.0.0.1:3000/graphql
+
+
+
+tr -d '\n' << EOF  > login.json
+{"query":
+  "mutation  Login(\$input: LoginUserInput!) {
+  login(input: \$input) {
+    email
+    id
+   }
+  }"
+,
+"variables":{
+   "input": {
+     "email": "user01@test.com",
+     "password": "Passw0rd!"
+   }
+ }
+ 
+}
+EOF
+
+# LOGIN GENERAL
+curl -c cookie.txt  -H "content-type: application/json" -X POST --data  @./login.json \
+http://127.0.0.1:3000/graphql
+
+
+
+data1.json
+{
+   "query":
+         "query ExampleUserQuery{ users { email id }}"
+}
+
+
+$get all User
+curl -b cookie.txt -H "content-type: application/json" -X POST --data  @./data1.json \
+http://127.0.0.1:3000/graphql
+
+ => OK
+
+# get Post
+curl -b cookie.txt  -H "content-type: application/json" -X POST --data  @./get_post.json \
+http://127.0.0.1:3000/graphql
+
+#create Post
+curl -b cookie.txt  -H "content-type: application/json" -X POST --data  @./create_post.json \
+http://127.0.0.1:3000/graphql
+
+
+# LOGOUT
+
+
+tr -d '\n' << EOF  > logout.json
+{"query":
+  "mutation   { logout }"
+}
+EOF
+curl -c cookie.txt -b cookie.txt -H "content-type: application/json" -X POST --data  @./logout.json \
+http://127.0.0.1:3000/graphql
+
+-----------------------------
+PLAYGROUND
+http://localhost:3000/graphql
+
+
+mutation Login($input: LoginUserInput!) {
+  login(input: $input) {
+    email
+    id
+  }
+}
+
+{
+  "input": {
+    "email": "admin@test.com",
+    "password": "Passw0rd!"
+  }
+}
+
+
+query ExampleUserQuery {
+  users {
+    email
+    id
+  }
+}
+
+
+-----------------------------
+【Redis 入門】よく使う redis-cli コマンドまとめ
+
+http://zenn.dev/leegrey/articles/4136078c49702d
+
+sudo apt install redis-tools 
+$ redis-cli
+127.0.0.1:6379> 
+
+$ redis-cli
+127.0.0.1:6379> keys *
+1) "sess:Nv2rVHSN-hveLZoTJDfo24_AVEuV1gPZ"
+2) "sess:yhdwouuwpPt3pZjSqDarVku_6GFbFOIF"
+
+127.0.0.1:6379> get "sess:yhdwouuwpPt3pZjSqDarVku_6GFbFOIF"
+"{\"cookie\":{\"originalMaxAge\":600000,\"expires\":\"2026-01-10T01:49:54.471Z\",\"secure\":false,\"httpOnly\":false,\"path\":\"/\"},\"passport\":{\"user\":{\"id\":\"fa119cb6-9135-57f5-8a5a-54f28d566d0f\",\"isAdmin\":false}}}"
+
+127.0.0.1:6379> TTL  "sess:1iIfVQig0F4pi32PRRvLnhbCjvhF6RoV"
+(integer) 577
+
+127.0.0.1:6379> del "sess:eWeqJjqiT-3vaIt9Eu5elHqVTPhALpd_"
+(integer) 1
+
