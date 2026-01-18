@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { DateTime } from 'luxon';
 
 /**
  * ユーザーモデル
@@ -19,9 +20,11 @@ export class User {
     password: string;
 
     @Field()
-    createdAt: Date;
+    //createdAt: Date;
+    createdAt: DateTime;
 
     @Field()
-    updatedAt: Date;
+    //updatedAt: Date;
+    updatedAt: DateTime;
 }
 
