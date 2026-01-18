@@ -6,8 +6,6 @@ import { CreateUserInput } from './dto/createUser.dto';
 import { UpdateUserPasswordInput } from './dto/updateUserPassword.dto';
 import { DeleteUserInput } from './dto/deleteUser.dto';
 
-import { DateTime } from 'luxon';
-
 //import datetime from 'datetime';
 
 //import { User } from './user.model';
@@ -30,30 +28,24 @@ const Users : IUser[] = [
   name: "devg1120",
   email: "devg1120@gmail.com",
   password: "test",
-  //createdAt: new Date('2020-05-08T22:16:39'),
-  //updatedAt: new Date('2020-05-08T22:16:39'),
-  createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
-  updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  createdAt: new Date('2020-05-08T22:16:39'),
+  updatedAt: new Date('2020-05-08T22:16:39'),
   },
   {
   id: 2,
   name: "alice",
   email: "alice@gmail.com",
   password: "test",
-  //createdAt: new Date('2020-05-08T22:16:39'),
-  //updatedAt: new Date('2020-05-08T22:16:39'),
-  createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
-  updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  createdAt: new Date('2020-05-08T22:16:39'),
+  updatedAt: new Date('2020-05-08T22:16:39'),
   },
   {
   id: 3,
   name: "bob",
   email: "bob@gmail.com",
   password: "test",
-  //createdAt: new Date('2020-05-08T22:16:39'),
-  //updatedAt: new Date('2020-05-08T22:16:39'),
-  createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
-  updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  createdAt: new Date('2020-05-08T22:16:39'),
+  updatedAt: new Date('2020-05-08T22:16:39'),
   },
 ];
 
@@ -134,8 +126,7 @@ export class UserService {
 	
 	max_id ++;
 	//let t1 = Date.now();
-        //let t1 =  new Date('2020-05-08T22:16:39');
-        let t1 =  DateTime.fromISO('2020-05-08T22:16:39');
+        let t1 =  new Date('2020-05-08T22:16:39');
 	let user:IUser = {
                     //id:String(max_id) ,
                     id:max_id ,
