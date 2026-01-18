@@ -1,0 +1,115 @@
+
+https://zenn.dev/kou_kawa/articles/30-graphql-nextjs-nestjs
+GraphQLをNestJSで使って学ぶ
+
+
+$ nest new  graphql-basic
+
+
+vi src/schema.gql
+
+
+yarn add @nestjs/graphql @nestjs/apollo @apollo/server graphql
+
+yarn add  class-validator class-transformer
+
+
+nest g module user
+nest g resolver user --no-spec
+nest g service user --no-spec
+
+$ tree src
+src/
+├── app.controller.spec.ts
+├── app.controller.ts
+├── app.module.ts
+├── app.service.ts
+├── main.ts
+├── schema.gql
+└── user
+    ├── decorator
+    │   └── customDecorator.ts
+    ├── dto
+    │   ├── createUser.dto.ts
+    │   ├── deleteUser.dto.ts
+    │   └── updateUserPassword.dto.ts
+    ├── user.model.ts
+    ├── user.module.ts
+    ├── user.resolver.ts
+    └── user.service.ts
+
+
+$ npm run start:dev
+
+http://127.0.0.1:3000/graphql
+
+
+###########################################################  getUsers
+query getUsers {
+     getUsers {
+       id
+       name
+       email
+   }
+}
+
+
+########################################################### createUser
+
+mutation createUser($createUserInput: CreateUserInput!) {
+  createUser(createUserInput: $createUserInput) {
+     id
+     name
+     email
+  }
+
+}
+
+{
+  "createUserInput": {
+    "name": "test",
+    "email": "test@gmail.com",
+    "password": "testtest",
+    "confirmPassword": "testtest"
+ }
+}
+
+###########################################################  updatePassword
+
+mutation updatePassword($updateUserPasswordInput: UpdateUserPasswordInput!) {
+  updatePassword(updateUserPasswordInput: $updateUserPasswordInput) {
+     id
+     name
+     email
+     password
+  }
+
+}
+
+{
+  "updateUserPasswordInput": {
+    "email": "test@gmail.com",
+    "password": "testtest",
+    "newPassword": "testtestNEW",
+    "confirmPassword": "testtestNEW"
+ }
+}
+
+########################################################### DeleteUser
+
+mutation deleteUser($deleteUserInput: DeleteUserInput!) {
+  deleteUser(deleteUserInput: $deleteUserInput) {
+     id
+  }
+
+}
+
+{
+  "deleteUserInput": {
+    "email": "bob@gmail.com"
+ }
+}
+
+=================================================================
+
+

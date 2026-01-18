@@ -1,0 +1,1 @@
+{"query":  "mutation  Login($input: LoginUserInput!) {  login(input: $input) {    email    id   }  }","variables":{   "input": {     "email": "admin@test.com",     "password": "Passw0rd!"   } }}
