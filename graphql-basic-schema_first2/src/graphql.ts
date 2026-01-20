@@ -51,7 +51,7 @@ export interface Comment {
 
 export interface IQuery {
     getPosts(): Nullable<Post[]> | Promise<Nullable<Post[]>>;
-    getPost(getPostInput: GetPostInput): Nullable<Post> | Promise<Nullable<Post>>;
+    getPostById(getPostInput: GetPostInput): Nullable<Post> | Promise<Nullable<Post>>;
     getUsers(): Nullable<User[]> | Promise<Nullable<User[]>>;
     getUser(getUserInput: GetUserInput): Nullable<User> | Promise<Nullable<User>>;
 }
