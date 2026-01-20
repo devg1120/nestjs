@@ -38,6 +38,7 @@ const Comments : CommentModel[] = [
   {
   id: 1,
   text: "comment 1",
+  postID: "1",
   authorID: "1",
   createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
   updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
@@ -45,6 +46,7 @@ const Comments : CommentModel[] = [
   {
   id: 2,
   text: "comment 2",
+  postID: "1",
   authorID: "2",
   createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
   updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
@@ -67,7 +69,7 @@ export class PostService {
     async getPostById(
         id: string,
     ): Promise<PostModel> {
-            console.log("getYserById", id);
+            console.log("getPostById", id);
         for ( let i = 0 ; i < Posts.length ; i++) {
            if ( Number(id) == Posts[i].id ) {
                   return  await Posts[i];
@@ -76,5 +78,49 @@ export class PostService {
 
         return await Posts[0]
     }
+
+    async getComments(
+        postId: number,
+    ): Promise<CommentModel[]> {
+            console.log("getCommenst", postId);
+       let c : CommentModel[] = [];
+        for ( let i = 0 ; i < Comments.length ; i++) {
+           if ( Number(postId) == Number(Comments[i].postID )) {
+                  c.push(Comments[i]);
+           }
+        }
+
+        return  c
+    }
+
+    async getAuthorId(
+        postId: number,
+    ): Promise<string> {
+            console.log("getAuthorId", postId);
+        for ( let i = 0 ; i < Comments.length ; i++) {
+           if ( Number(postId) == Number(Comments[i].postID )) {
+                  Comments[i].authorID
+           }
+        }
+
+        return   Comments[0].authorID
+    }
+
+    async getPostById2(
+        id: string,
+    ): Promise<PostModel> {
+            console.log("getPostById", id);
+        for ( let i = 0 ; i < Posts.length ; i++) {
+           if ( Number(id) == Posts[i].id ) {
+                  //return  await Posts[i];
+                  let tmp = Posts[i];
+		  tmp["author"] = { id : "1", name : "gusa" }
+                  return  await tmp
+           }
+        }
+
+        return await Posts[0]
+    }
+
 
 }

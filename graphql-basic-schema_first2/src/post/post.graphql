@@ -16,6 +16,7 @@ type Comment {
 type Query {
   getPosts: [Post!]
   getPostById(getPostInput: GetPostInput!): Post
+  getPostById2(getPostInput: GetPostInput!): Post
 }
 
 type Mutation {

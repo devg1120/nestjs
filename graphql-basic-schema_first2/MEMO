@@ -222,4 +222,56 @@ mutation deleteUser($deleteUserInput: DeleteUserInput!) {
 
 =================================================================
 
+###########################################################  getPosts
+query getPosts {
+     getPosts {
+       id
+       title
+       content
+   }
+}
+
+###########################################################  getPost
+query getPostById($getPostInput: GetPostInput!) {
+     getPostById(getPostInput: $getPostInput) {
+       id
+       title
+       content
+   }
+}
+query getPostById2($getPostInput: GetPostInput!) {
+     getPostById2(getPostInput: $getPostInput) {
+       id
+       title
+       content
+       author  { id name }
+   }
+}
+
+query getPostById($getPostInput: GetPostInput!) {
+     getPostById(getPostInput: $getPostInput) {
+       id
+       title
+       content
+       comments { id text }
+   }
+}
+
+query getPostById($getPostInput: GetPostInput!) {
+     getPostById(getPostInput: $getPostInput) {
+       id
+       title
+       author   { name }
+       content
+       comments { id text }
+   }
+}
+
+
+
+{
+  "getPostInput": {
+    "id": "3"
+ }
+}
 

@@ -14,6 +14,7 @@ export class Comment {
 
     id: number;
     text: string;
+    postID: string;
     authorID: string;
     createdAt: DateTime;
     updatedAt: DateTime;
