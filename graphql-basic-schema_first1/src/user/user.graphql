@@ -1,0 +1,53 @@
+
+scalar DateTime
+
+type User {
+  id: Int!
+  name: String!
+  email: String!
+  password: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Query {
+  getUsers: [User!]
+  getUser(getUserInput: GetUserInput!): User
+}
+
+
+type Mutation {
+  # ユーザーの追加
+  createUser(createUserInput: CreateUserInput!): User!
+  # パスワードの変更
+  updatePassword(updateUserPasswordInput: UpdateUserPasswordInput!): User!
+  # ユーザーの削除
+  deleteUser(deleteUserInput: DeleteUserInput!): User!
+}
+
+
+input GetUserInput {
+  id: String!
+}
+
+# ユーザーの追加(入力用)
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
+}
+
+# パスワードの変更(入力用)
+input UpdateUserPasswordInput {
+  email: String
+  password: String
+  newPassword: String
+  confirmPassword: String
+}
+
+# ユーザーの削除(入力用)
+input DeleteUserInput {
+  email: String!
+}
+

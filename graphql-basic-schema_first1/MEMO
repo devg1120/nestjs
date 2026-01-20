@@ -1,0 +1,225 @@
+
+
+https://qiita.com/megumi_i/items/a9911598becbe739803b
+JavaScriptライブラリ Luxonの基本的な使い方　
+
+
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+
+      //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        path: join(process.cwd(), 'src/graphql.ts'),
+        //outputAs: 'class',
+        outputAs: 'interface',
+      },
+
+
+      playground: true,
+    }),
+    UserModule,
+  ],
+})
+export class AppModule {}
+
+
+========================================
+manual edit 
+  src/user/user.graphql
+  src/user/user.resolver.ts
+
+auto generated
+  src/graphql.ts     #class or interface
+
+
+========================================
+https://zenn.dev/kou_kawa/articles/30-graphql-nextjs-nestjs
+GraphQLをNestJSで使って学ぶ
+
+
+$ nest new  graphql-basic
+
+
+vi src/schema.gql
+
+
+yarn add @nestjs/graphql @nestjs/apollo @apollo/server graphql
+
+yarn add  class-validator class-transformer
+
+
+nest g module user
+nest g resolver user --no-spec
+nest g service user --no-spec
+
+$ tree src
+src/
+├── app.controller.spec.ts
+├── app.controller.ts
+├── app.module.ts
+├── app.service.ts
+├── main.ts
+├── schema.gql
+└── user
+    ├── decorator
+    │   └── customDecorator.ts
+    ├── dto
+    │   ├── createUser.dto.ts
+    │   ├── deleteUser.dto.ts
+    │   └── updateUserPassword.dto.ts
+    ├── user.model.ts
+    ├── user.module.ts
+    ├── user.resolver.ts
+    └── user.service.ts
+
+
+$ npm run start:dev
+
+http://127.0.0.1:3000/graphql
+
+
+###########################################################  getUsers
+query getUsers {
+     getUsers {
+       id
+       name
+       email
+       password
+   }
+}
+
+###########################################################  getUser
+query getUser($getUserInput: GetUserInput!) {
+     getUser(getUserInput: $getUserInput) {
+       id
+       name
+       email
+       password
+   }
+}
+
+{
+  "getUserInput": {
+    "id": "3"
+ }
+}
+
+###########################################################  getUser alias
+
+query getUser($getUserInput1: GetUserInput!,$getUserInput2: GetUserInput!) {
+     user1:getUser(getUserInput: $getUserInput1) {
+       id
+       name
+       email
+       password
+  },
+     user2: getUser(getUserInput: $getUserInput2) {
+       id
+       name
+       email
+       password
+   }
+}
+
+
+{
+  "getUserInput1": {
+    "id": "3"
+ },
+  "getUserInput2": {
+    "id": "1"
+ }
+}
+
+###########################################################  getUser fragment
+
+query getUser($getUserInput1: GetUserInput!,$getUserInput2: GetUserInput!) {
+     user1:getUser(getUserInput: $getUserInput1) {
+       ...userField
+  },
+     user2: getUser(getUserInput: $getUserInput2) {
+       ...userField
+   }
+}
+
+fragment userField on User {
+       id
+       name
+       email
+       password
+
+}
+
+{
+  "getUserInput1": {
+    "id": "3"
+ },
+  "getUserInput2": {
+    "id": "1"
+ }
+}
+########################################################### createUser
+
+mutation createUser($createUserInput: CreateUserInput!) {
+  createUser(createUserInput: $createUserInput) {
+     id
+     name
+     email
+     password
+  }
+
+}
+
+{
+  "createUserInput": {
+    "name": "test",
+    "email": "test@gmail.com",
+    "password": "testtest",
+    "confirmPassword": "testtest"
+ }
+}
+
+###########################################################  updatePassword
+
+mutation updatePassword($updateUserPasswordInput: UpdateUserPasswordInput!) {
+  updatePassword(updateUserPasswordInput: $updateUserPasswordInput) {
+     id
+     name
+     email
+     password
+  }
+
+}
+
+{
+  "updateUserPasswordInput": {
+    "email": "test@gmail.com",
+    "password": "testtest",
+    "newPassword": "testtestNEW",
+    "confirmPassword": "testtestNEW"
+ }
+}
+
+########################################################### DeleteUser
+
+mutation deleteUser($deleteUserInput: DeleteUserInput!) {
+  deleteUser(deleteUserInput: $deleteUserInput) {
+     id
+  }
+
+}
+
+{
+  "deleteUserInput": {
+    "email": "bob@gmail.com"
+ }
+}
+
+=================================================================
+
+

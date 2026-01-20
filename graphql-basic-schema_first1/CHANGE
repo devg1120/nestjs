@@ -1,0 +1,17 @@
+
+
+
+rm  user/user.interface.ts
+
+
+-------------------------
+src/user/iuser.ts
+src/user/user.interface.ts
+
+
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+  },
+
+
