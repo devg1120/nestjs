@@ -12,6 +12,10 @@ export interface GetPostInput {
     id: string;
 }
 
+export interface GetCommentInput {
+    id: string;
+}
+
 export interface GetUserInput {
     id: string;
 }
@@ -40,6 +44,8 @@ export interface Post {
     content?: Nullable<string>;
     author: User;
     comments: Comment[];
+    comments2: Comment[];
+    comments3: Comment[];
 }
 
 export interface Comment {
@@ -53,6 +59,8 @@ export interface IQuery {
     getPosts(): Nullable<Post[]> | Promise<Nullable<Post[]>>;
     getPostById(getPostInput: GetPostInput): Nullable<Post> | Promise<Nullable<Post>>;
     getPostById2(getPostInput: GetPostInput): Nullable<Post> | Promise<Nullable<Post>>;
+    getComments(): Nullable<Comment[]> | Promise<Nullable<Comment[]>>;
+    getCommentById(getCommentInput: GetCommentInput): Nullable<Comment> | Promise<Nullable<Comment>>;
     getUsers(): Nullable<User[]> | Promise<Nullable<User[]>>;
     getUser(getUserInput: GetUserInput): Nullable<User> | Promise<Nullable<User>>;
 }

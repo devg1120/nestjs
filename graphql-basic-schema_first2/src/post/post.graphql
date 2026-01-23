@@ -4,6 +4,8 @@ type Post {
   content: String
   author: User!
   comments: [Comment!]!
+  comments2: [Comment!]!
+  comments3: [Comment!]!
 }
 
 type Comment {
@@ -17,6 +19,8 @@ type Query {
   getPosts: [Post!]
   getPostById(getPostInput: GetPostInput!): Post
   getPostById2(getPostInput: GetPostInput!): Post
+  getComments: [Comment!]
+  getCommentById(getCommentInput: GetCommentInput!): Comment
 }
 
 type Mutation {
@@ -25,5 +29,9 @@ type Mutation {
 }
 
 input GetPostInput {
+  id: String!
+}
+
+input GetCommentInput {
   id: String!
 }

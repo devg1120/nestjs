@@ -1,14 +1,15 @@
 import { Args, Int, ID, Mutation, Query, Resolver, ResolveField, Parent } from '@nestjs/graphql';
 
 import { PostService } from './post.service';
-import { Post as PostModel } from './post.model';
+import { Comment as CommentModel } from './post.model';
 import { UserService } from '../user/user.service';
 import { User as UserModel } from '../user/user.model';
 import { GetPostInput } from './dto/getPost.dto';
+import { GetCommentInput } from './dto/getComment.dto';
 
 //@Resolver( () => PostModel)
-@Resolver( 'Post')
-export class PostResolver {
+@Resolver( 'Comment')
+export class CommentResolver {
 
 
     // DI
@@ -16,12 +17,29 @@ export class PostResolver {
 		private readonly userService: UserService
 	       ) {}
 
-    @Query(() => [PostModel], { nullable: true })
-    async getPosts(): Promise<PostModel[]> {
-        console.log("getPosts");
-        return await this.postService.getPosts();
+    @Query(() => [CommentModel], { nullable: true })
+    async getComments(): Promise<CommentModel[]> {
+        console.log("getComments");
+        return await this.postService.getAllComments();
     }
 
+    @Query(() => CommentModel, { nullable: true })
+    async getCommentById(
+        @Args('getCommentInput') getCommentInput: GetCommentInput,
+    ): Promise<CommentModel> {
+        console.log("getCommentById",getCommentInput.id);
+        return await this.postService.getCommentById(String(getCommentInput.id));
+    }
+
+
+
+    @ResolveField( 'author', () => UserModel)
+    async getAuthor(@Parent() { id }: UserModel) {
+      return await this.userService.getUserById( String(id) );
+    }
+
+
+/*
     @Query(() => PostModel, { nullable: false })
     async getPostById(
         @Args('getPostInput') getPostInput: GetPostInput,
@@ -68,5 +86,5 @@ export class PostResolver {
       let user_id = this.postService.getAuthorId( id );
       return this.userService.getUserById( String(user_id) );
     }
-
+*/
 }

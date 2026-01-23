@@ -107,7 +107,7 @@ export class UserService {
         id: string,
     //): Promise<IUser> {
     ): Promise<UserModel> {
-	    console.log("getYserById", id);
+	    console.log("getUserById", id);
         //return await this.prismaService.user.findUnique({
         //    where: { email },
         //});

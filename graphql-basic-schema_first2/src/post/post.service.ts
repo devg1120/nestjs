@@ -51,6 +51,22 @@ const Comments : CommentModel[] = [
   createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
   updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
   },
+  {
+  id: 3,
+  text: "comment 3",
+  postID: "3",
+  authorID: "1",
+  createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  },
+  {
+  id: 4,
+  text: "comment 4",
+  postID: "3",
+  authorID: "2",
+  createdAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  updatedAt: DateTime.fromISO('2020-05-08T22:16:39'),
+  },
 
 ];
 
@@ -79,6 +95,24 @@ export class PostService {
         return await Posts[0]
     }
 
+    async getAllComments(
+    ): Promise<CommentModel[]> {
+         console.log("getAllCommenst");
+	 return Comments;
+    }
+
+    async getCommentById(
+        id: string,
+    ): Promise<CommentModel> {
+         console.log("getCommenst", id);
+        for ( let i = 0 ; i < Comments.length ; i++) {
+           if ( Number(id) == Number(Comments[i].id )) {
+                  return await Comments[i];
+           }
+        }
+                  return await Comments[0];
+    }
+   
     async getComments(
         postId: number,
     ): Promise<CommentModel[]> {
@@ -93,6 +127,21 @@ export class PostService {
         return  c
     }
 
+    async getComments2(
+        postId: number,
+    ): Promise<CommentModel[]> {
+            console.log("getCommenst", postId);
+       let c : CommentModel[] = [];
+        for ( let i = 0 ; i < Comments.length ; i++) {
+           if ( Number(postId) == Number(Comments[i].postID )) {
+                  let tmp = Comments[i];
+		  tmp["author"] = { id : "1", name : "gusa" }
+                  c.push(tmp);
+           }
+        }
+
+        return  c
+    }
     async getAuthorId(
         postId: number,
     ): Promise<string> {

@@ -1,4 +1,7 @@
 
+コードファーストかスキーマファーストか
+
+https://zenn.dev/kai/articles/learning-graphql-nestjs
 
 https://qiita.com/megumi_i/items/a9911598becbe739803b
 JavaScriptライブラリ Luxonの基本的な使い方　
@@ -268,10 +271,54 @@ query getPostById($getPostInput: GetPostInput!) {
 }
 
 
+query getPostById($getPostInput: GetPostInput!) {
+     getPostById(getPostInput: $getPostInput) {
+       id
+       title
+       author   { name }
+       content
+       comments2 { id text author { name }}
+   }
+}
+
 
 {
   "getPostInput": {
     "id": "3"
  }
 }
+============================================
 
+###########################################################  getComments
+query getComments {
+     getComments {
+       id
+       text
+   }
+}
+
+
+
+query getComments {
+     getComments {
+       id
+       text
+       author { id name }
+   }
+}
+
+#############################
+
+query getCommentById($getCommentInput: GetCommentInput!) {
+     getCommentById(getCommentInput: $getCommentInput) {
+       id
+       text
+       author { id name }
+   }
+}
+
+{
+  "getCommentInput": {
+    "id": "1"
+ }
+}

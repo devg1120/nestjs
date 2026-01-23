@@ -1,1 +1,1 @@
-{"query":      "       query getUsers {               getUsers {                 id                 name                 email                 password                 createdAt                 updatedAt             }        }      "}
+{"query":     "      query getUser($getUserInput: GetUserInput!) {          getUser(getUserInput: $getUserInput) {            id            name            email            password            createdAt            updatedAt        }     }    ","variables":  {     "getUserInput": {       "id": "3"      }  }}

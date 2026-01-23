@@ -1,0 +1,1 @@
+{"query":     "query getPostById($getPostInput: GetPostInput!) {     getPostById(getPostInput: $getPostInput) {       id       title       author   { name }       content       comments3 { id text author { id name }}   }}    ","variables":  {      "getPostInput": {        "id": "3"     }  }}
